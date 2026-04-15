@@ -1,6 +1,6 @@
 # DarkGhost NDR
 
-**Network Detection & Response** – anomaly-based behavioral analysis for local networks.  
+Network Detection & Response – anomaly-based behavioral analysis for local networks.
 Open-source alternative to commercial NDR solutions (Darktrace, ExtraHop, Vectra).
 
 Built by Ilie Lucian — Cyprus, 2026
@@ -11,15 +11,13 @@ Built by Ilie Lucian — Cyprus, 2026
 
 ![DarkGhost Dashboard](screenshot.png)
 
-*Placeholder: add your dashboard screenshot as `screenshot.png` in the repository root.*
-
 ---
 
 ## What DarkGhost Does
 
-DarkGhost passively monitors network traffic and learns what **normal** behavior looks like for every device. When something deviates, it generates an **anomaly score (0 to 1)** and a **risk level**.
+DarkGhost passively monitors network traffic and learns what normal behavior looks like for every device. When something deviates, it generates an anomaly score from 0 to 1 and a risk level.
 
-It does not rely on signatures. It detects what is *weird*, not just what is *known*.
+It does not rely on signatures. It detects what is weird, not just what is known.
 
 ---
 
@@ -51,19 +49,9 @@ The scoring algorithm compares current traffic against the baseline:
 | Night traffic (00:00 to 06:00) | 0.7 |
 | Packet size > 10x normal average | 0.6 |
 
-**Final score** = (highest score x 0.6) + (average of all scores x 0.4)  
+Final score = (highest score x 0.6) + (average of all scores x 0.4)
+
 Result ranges from 0.1 (normal) to 0.95 (critical anomaly)
-
----
-
-## Live Dashboard (Web Interface)
-
-The dashboard shows:
-- Total packets and alerts
-- CRITICAL / HIGH / MEDIUM counters
-- Monitored devices with detected OS
-- Live alert log with anomaly score, risk, and reason
-- Auto-refresh every 5 seconds
 
 ---
 
@@ -81,14 +69,9 @@ The dashboard shows:
 
 ## Architecture (High Level)
 
-[Network Traffic] -> [Scapy Capture] -> [Baseline Learning] -> [Anomaly Scoring] -> [Alert Engine] -> [Flask Dashboard]
+Network Traffic (SPAN port) -> Traffic Collector (Scapy) -> Baseline Engine -> Anomaly Detector -> Alert Engine -> Flask Dashboard
 
-Filters: local IPs only, ignores multicast  
-Baseline stores: protocols, ports, destinations, hourly traffic, packet sizes  
-Scoring compares current event against baseline  
-Output: JSON alerts + live web UI
-
-No external database required. Baseline is stored in `baseline.json`.
+No external database required. Baseline is stored in baseline.json.
 
 ---
 
@@ -104,23 +87,21 @@ No external database required. Baseline is stored in `baseline.json`.
 
 ---
 
-## Repository Structure (Documentation Only)
+## Repository Structure
 
-DarkGhost-NDR/  
-├── README.md               (this file)  
-├── screenshot.png          (dashboard screenshot)  
-└── docs/  
-    ├── architecture.md  
-    ├── deployment.md  
-    └── anomaly_scoring.md  
+DarkGhost-NDR/
+├── README.md
+├── screenshot.png
+└── docs/
+    ├── architecture.md
+    ├── deployment.md
+    └── anomaly_scoring.md
 
 Note: This repository contains documentation only. The source code is proprietary and not publicly available.
 
 ---
 
-## Deployment Overview (For Enterprise Clients)
-
-DarkGhost is designed to be deployed on a dedicated VM or server with access to a mirrored switch port (SPAN port). It runs as a passive sensor – no inline blocking, no changes to existing network.
+## Deployment Overview
 
 Basic requirements:
 - Linux VM (Ubuntu 22.04 or later)
@@ -144,9 +125,9 @@ Basic requirements:
 
 ## Author
 
-Ilie Lucian – Cybersecurity Engineer  
-Based in Cyprus  
-LinkedIn: linkedin.com/in/ilielucian  
+Ilie Lucian – Cybersecurity Engineer
+Based in Cyprus
+LinkedIn: linkedin.com/in/ilielucian
 GitHub: github.com/ilielucianno
 
 ---
