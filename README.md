@@ -1,9 +1,8 @@
 # DarkGhost NDR
 
-Network Detection & Response – anomaly-based behavioral analysis for local networks.
-Alternative to commercial NDR solutions (Darktrace, ExtraHop, Vectra).
+Network Detection & Response — Anomaly-based Behavioral Analysis + SQL Injection Detector
 
-Built by Ilie Lucian — Cyprus, 2026
+Built by Ilie Lucian — April 2026
 
 ---
 
@@ -13,81 +12,67 @@ Built by Ilie Lucian — Cyprus, 2026
 
 ---
 
-## What DarkGhost Does
+## What it does
 
-DarkGhost passively monitors network traffic and learns what normal behavior looks like for every device. When something deviates, it generates an anomaly score from 0 to 1 and a risk level.
+I built this to monitor my own network. It learns how each device normally behaves and raises alerts when something changes.
 
-It does not rely on signatures. It detects what is weird, not just what is known.
-
----
-
-## Key Features
-
-| Feature | Description |
-|---------|-------------|
-| Baseline learning | Learns normal behavior per device (protocols, ports, destinations, hourly patterns) |
-| Anomaly scoring | Score from 0.0 (normal) to 1.0 (highly anomalous) |
-| Risk levels | CRITICAL / HIGH / MEDIUM / LOW based on score |
-| TTL fingerprinting | Detects MAC/IP spoofing by tracking OS changes (Windows=128, Linux=64, Router=255) |
-| Port scan detection | Identifies rapid connection attempts to many ports |
-| Sensitive port alerting | SSH (22), RDP (3389), Metasploit (4444), VNC (5900) |
-| Large packet detection | Flags possible data exfiltration |
-| Unusual hour detection | Traffic between 00:00 and 06:00 |
-| Live dashboard | Web interface with real-time alerts and device OS detection |
+It does not use signatures. It looks for weird things.
 
 ---
 
-## Anomaly Scoring Logic
+## What it detects
 
-The scoring algorithm compares current traffic against the baseline:
-
-| Anomaly type | Score contribution |
-|--------------|--------------------|
-| New protocol for this device | 0.7 |
-| Sensitive port (SSH, RDP, 4444) | 0.9 |
-| New external destination | 0.4 |
-| Night traffic (00:00 to 06:00) | 0.7 |
-| Packet size > 10x normal average | 0.6 |
-
-Final score = (highest score x 0.6) + (average of all scores x 0.4)
-
-Result ranges from 0.1 (normal) to 0.95 (critical anomaly)
+| Detection | Example |
+|-----------|---------|
+| New protocol | Device starts using ICMP for first time |
+| Sensitive port | SSH, RDP, Metasploit (4444) |
+| New destination | Device talks to unknown IP |
+| Night traffic | Activity between 00:00 and 06:00 |
+| Large packets | Possible data exfiltration |
+| Port scan | Many ports in short time |
+| Spoofing | TTL changes (Windows to Linux) |
 
 ---
 
-## Real-World Detection Examples
+## How scoring works
 
-| Scenario | Detection | Score |
-|----------|-----------|-------|
-| A workstation starts SSH for the first time | Port 22, new protocol | 0.78 HIGH |
-| A device scans 50 ports in 10 seconds | Port scan | 0.90 CRITICAL |
-| A server sends 15000 bytes (normal avg: 300) | Large packet | 0.60 HIGH |
-| A Windows device suddenly shows Linux TTL | Spoofing alert | 0.92 CRITICAL |
-| A device talks to a new external IP at 3 AM | New dest + unusual hour | 0.70 HIGH |
+Each anomaly adds points. Final score is weighted:
 
----
+final = (highest x 0.6) + (average x 0.4)
 
-## Architecture (High Level)
+Score ranges from 0.1 (normal) to 0.95 (critical).
 
-Network Traffic (SPAN port) -> Traffic Collector (Scapy) -> Baseline Engine -> Anomaly Detector -> Alert Engine -> Flask Dashboard
-
-No external database required. Baseline is stored in baseline.json.
+Risk levels: CRITICAL (0.8+), HIGH (0.6+), MEDIUM (0.4+), LOW (0.2+)
 
 ---
 
-## Technologies Used
+## Live dashboard
 
-| Component | Technology |
-|-----------|------------|
-| Packet capture | Scapy (Python) |
-| Web dashboard | Flask + HTML/CSS/JS |
-| Data storage | JSON |
-| OS detection | TTL fingerprinting |
-| Anomaly scoring | Weighted algorithm |
+Web interface shows:
+- Total packets and alerts
+- Devices with detected OS
+- Live alert log with score and reason
+- Auto-refresh every 5 seconds
 
 ---
 
-## Repository Structure
+## Architecture
+
+Traffic (SPAN port) -> Scapy capture -> Baseline -> Anomaly score -> Alert -> Flask dashboard
+
+No database needed. Baseline saved to baseline.json.
+
+---
+
+## Technologies
+
+- Python 3 (Scapy, Flask, requests)
+- HTML/CSS/JS (dashboard)
+- JSON for storage
+
+---
+
+## Repository content
 
 DarkGhost-NDR/
 ├── README.md
@@ -97,36 +82,30 @@ DarkGhost-NDR/
     ├── deployment.md
     └── anomaly_scoring.md
 
-Note: This repository contains documentation only. The source code is proprietary and not publicly available.
+Note: Documentation only. Source code is proprietary.
 
 ---
 
-## Deployment Overview
+## Deployment
 
-Basic requirements:
-- Linux VM (Ubuntu 22.04 or later)
-- Python 3.10 or later
+Requirements:
+- Ubuntu 22.04 or later
+- Python 3.10+
 - Network interface in promiscuous mode
-- Access to SPAN / mirror port on the core switch
+- SPAN / mirror port on switch
 
 ---
 
-## Why DarkGhost vs Commercial NDR
+## Why not Darktrace
 
-| Aspect | Commercial (Darktrace, etc.) | DarkGhost |
-|--------|------------------------------|-----------|
-| Price | 50,000 - 200,000 EUR per year | Service-based, affordable |
-| Detection | Behavioral + proprietary ML | Behavioral + transparent ML |
-| False positives | Known issue | Tunable, baseline adapts |
-| Transparency | Black box | Open architecture, clear logic |
-| Deployment | Complex, dedicated team | Lightweight, one person can run it |
+Darktrace is expensive (50k+ EUR/year) and closed. This is lighter, transparent, and tunable.
 
 ---
 
 ## Author
 
 Ilie Lucian – Cybersecurity Engineer
-Based in Cyprus
+Cyprus
 LinkedIn: linkedin.com/in/ilielucian
 GitHub: github.com/ilielucianno
 
@@ -134,12 +113,10 @@ GitHub: github.com/ilielucianno
 
 ## License
 
-Proprietary – not open source. For licensing inquiries, please contact the author.
+Proprietary. Not open source. For licensing or demo requests, contact me.
 
 ---
 
-## Final Note
+## Note
 
-DarkGhost was built from real-world experience managing network security for a 15-person IT team. It has been tested on home and small-business networks and detects real anomalies that signature-based tools miss.
-
-If you are interested in a demo or deployment for your company, reach out.
+This project runs on my home network and at a small office. It catches real anomalies that signature tools miss. If you want to try it, reach out.
