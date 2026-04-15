@@ -1,4 +1,4 @@
-# DarkGhost NDR
+# DarkGhost NDR v3.0.1
 
 Network Detection & Response — Anomaly-based Behavioral Analysis
 
