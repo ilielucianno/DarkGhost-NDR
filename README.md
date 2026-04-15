@@ -14,7 +14,7 @@ Built by Ilie Lucian — April 2026
 
 ## What it does
 
-I built this to monitor my own networks (see my repositories to understand on what networks I tested it). It learns how each device normally behaves and raises alerts when something changes.
+I built this to monitor my own 2 nnetworks (see my repositories to understand on what networks I tested it). It learns how each device normally behaves and raises alerts when something changes.
 
 It does not use signatures. It looks for weird things in the network.
 
