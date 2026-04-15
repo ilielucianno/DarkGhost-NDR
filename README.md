@@ -1,6 +1,6 @@
 # DarkGhost NDR
 
-Network Detection & Response — Anomaly-based Behavioral Analysis + SQL Injection Detector
+Network Detection & Response — Anomaly-based Behavioral Analysis
 
 Built by Ilie Lucian — April 2026
 
@@ -12,30 +12,53 @@ Built by Ilie Lucian — April 2026
 
 ---
 
-## What it does
+## What It Does
 
-I built this to monitor my own 2 nnetworks (see my repositories to understand on what networks I am testing it).
-It learns how each device normally behaves and raises alerts when something changes.
+DarkGhost monitors network traffic and learns how each device normally behaves. When something changes, it raises an alert with an anomaly score from 0 to 1.
 
-It does not use signatures. It looks for weird things in the network.
-
----
-
-## What it detects
-
-| Detection | Example |
-|-----------|---------|
-| New protocol | Device starts using ICMP for first time |
-| Sensitive port | SSH, RDP, Metasploit (4444) |
-| New destination | Device talks to unknown IP |
-| Night traffic | Activity between 00:00 and 06:00 |
-| Large packets | Possible data exfiltration |
-| Port scan | Many ports in short time |
-| Spoofing | TTL changes (Windows to Linux) |
+It does not use signatures. It detects weird behavior, not just known attacks.
 
 ---
 
-## How scoring works
+## Detection Features
+
+| Feature | Description |
+|---------|-------------|
+| Baseline learning | Learns normal behavior per device (protocols, ports, destinations, hourly patterns) |
+| Anomaly scoring | Score from 0.0 to 1.0 |
+| Risk levels | CRITICAL / HIGH / MEDIUM / LOW |
+| TTL fingerprinting | Detects MAC/IP spoofing (Windows=128, Linux=64, Router=255) |
+| Port scan detection | Identifies rapid connection attempts to many ports |
+| Sensitive port alerting | SSH (22), RDP (3389), Metasploit (4444), VNC (5900) |
+| Large packet detection | Flags possible data exfiltration |
+| Night traffic detection | Activity between 00:00 and 06:00 |
+| Traffic spike detection | Sudden increase in packet rate |
+
+---
+
+## Version History
+
+### v1 (Initial)
+- Baseline learning per device
+- Anomaly scoring with weighted formula
+- Live dashboard with OS detection
+- TTL fingerprinting for spoofing detection
+
+### v2
+- Added port scan detection
+- Added sensitive port alerting
+- Added large packet detection
+- Added night traffic detection
+- Improved scoring algorithm
+
+### v3 (Current)
+- Added traffic spike detection (rate-based anomalies)
+- Optimized alert engine
+- Improved stability and false positive reduction
+
+---
+
+## How Scoring Works
 
 Each anomaly adds points. Final score is weighted:
 
@@ -43,25 +66,20 @@ final = (highest x 0.6) + (average x 0.4)
 
 Score ranges from 0.1 (normal) to 0.95 (critical).
 
-Risk levels: CRITICAL (0.8+), HIGH (0.6+), MEDIUM (0.4+), LOW (0.2+)
-
----
-
-## Live dashboard
-
-Web interface shows:
-- Total packets and alerts
-- Devices with detected OS
-- Live alert log with score and reason
-- Auto-refresh every 5 seconds
+Risk levels:
+- 0.80 - 1.00 : CRITICAL
+- 0.60 - 0.79 : HIGH
+- 0.40 - 0.59 : MEDIUM
+- 0.20 - 0.39 : LOW
+- 0.00 - 0.19 : NORMAL
 
 ---
 
 ## Architecture
 
-Traffic (SPAN port) -> Scapy capture -> Baseline -> Anomaly score -> Alert -> Flask dashboard
+Network Traffic (SPAN port) -> Scapy Capture -> Baseline Engine -> Anomaly Detector -> Alert Engine -> Flask Dashboard
 
-No database needed. Baseline saved to baseline.json.
+No database needed. Baseline is saved to baseline.json every 30 seconds.
 
 ---
 
@@ -73,7 +91,7 @@ No database needed. Baseline saved to baseline.json.
 
 ---
 
-## Repository content
+## Repository Structure
 
 DarkGhost-NDR/
 ├── README.md
@@ -83,41 +101,46 @@ DarkGhost-NDR/
     ├── deployment.md
     └── anomaly_scoring.md
 
-Note: Documentation only. Source code is proprietary.
+Note: This repository contains documentation only. Source code is proprietary.
 
 ---
 
-## Deployment
+## Deployment Requirements
 
-Requirements:
 - Ubuntu 22.04 or later
-- Python 3.10+
+- Python 3.10 or later
 - Network interface in promiscuous mode
-- SPAN / mirror port on switch
+- SPAN / mirror port on core switch
 
 ---
 
-## Why not Darktrace
+## Why DarkGhost vs Commercial NDR
 
-Darktrace is expensive (50k+ EUR/year) and closed. This is lighter, transparent, and tunable.
+| Aspect | Commercial | DarkGhost |
+|--------|------------|-----------|
+| Price | 50k - 200k EUR/year | Affordable |
+| Detection | Behavioral + proprietary ML | Behavioral + transparent |
+| False positives | Known issue | Tunable |
+| Transparency | Black box | Open logic |
+| Deployment | Complex | Lightweight |
 
 ---
 
 ## Author
 
-Ilie Lucian – Cybersecurity Engineer
-Cyprus
-LinkedIn: linkedin.com/in/ilielucian
+Ilie Lucian – Cybersecurity Engineer  
+Cyprus  
+LinkedIn: linkedin.com/in/ilielucian  
 GitHub: github.com/ilielucianno
 
 ---
 
 ## License
 
-Proprietary. Not open source. For licensing or demo requests, contact me.
+Proprietary. Not open source. For licensing or demo requests, contact the author.
 
 ---
 
 ## Note
 
-This project runs on my home network and at a small office. It catches real anomalies that signature tools miss. If you want to try it, reach out.
+Built from real-world experience managing network security for a 15-person IT team. Tested on home and small-business networks.
