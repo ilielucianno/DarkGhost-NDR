@@ -1,7 +1,7 @@
 # DarkGhost NDR
 
 Network Detection & Response – anomaly-based behavioral analysis for local networks.
-Open-source alternative to commercial NDR solutions (Darktrace, ExtraHop, Vectra).
+Alternative to commercial NDR solutions (Darktrace, ExtraHop, Vectra).
 
 Built by Ilie Lucian — Cyprus, 2026
 
