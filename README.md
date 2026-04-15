@@ -16,7 +16,7 @@ Built by Ilie Lucian — April 2026
 
 I built this to monitor my own network. It learns how each device normally behaves and raises alerts when something changes.
 
-It does not use signatures. It looks for weird things.
+It does not use signatures. It looks for weird things in the network.
 
 ---
 
