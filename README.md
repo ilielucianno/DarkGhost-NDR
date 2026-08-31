@@ -1,6 +1,6 @@
 # DarkGhost NDR v3.0.1
 
-Network Detection & Response — Anomaly-based Behavioral Analysis
+Network Detection & Response — Anomaly-based Behavioral Analysis 
 
 Built by Ilie Lucian — April 2026
 
